@@ -64,6 +64,10 @@ namespace HelloMVC.Controllers
         [HttpPost]
         public ActionResult AddCustomer(Customer customer)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(customer);
+            }
             customer.Id = Guid.NewGuid().ToString();
             customers.Add(customer);
             SaveCache();
@@ -86,6 +90,10 @@ namespace HelloMVC.Controllers
 
         public ActionResult EditCustomer(Customer customer, string Id)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(customer);
+            }
             var customerToEdit = customers.FirstOrDefault(c => c.Id == Id);
             if (customer == null)
             {
@@ -103,6 +111,35 @@ namespace HelloMVC.Controllers
         public ActionResult CustomerList(){
             
             return View(customers);
+        }
+
+        public ActionResult DeleteCustomer(String Id)
+        {
+            Customer customer = customers.FirstOrDefault(c => c.Id == Id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                return View(customer);
+            }
+        }
+        [HttpPost]
+
+        [ActionName("DeleteCustomer")]
+        public ActionResult ConfirmDeleteCustomer(String Id)
+        {
+            Customer customer = customers.FirstOrDefault(c => c.Id == Id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                customers.Remove(customer);
+                return RedirectToAction("CustomerList");
+            }
         }
     }
 }
